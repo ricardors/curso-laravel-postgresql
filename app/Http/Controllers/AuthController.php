@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserRequest;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Response;
 use JWTAuth;
 
 use Illuminate\Http\Request;
@@ -12,10 +15,11 @@ use Tymon\JWTAuth\Facades\JWTAuth as FacadesJWTAuth;
 
 class AuthController extends Controller
 {
-    //
-    public function __construct()
+    private $service;
+    public function __construct(UserService $service)
     {
         $this->middleware('auth:api', ['except' => ['login', 'register']]); //login, register methods won't go through the api guard
+        $this->service = $service;
     }
     public function login(Request $request)
     {
@@ -64,22 +68,9 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
-    public function register(Request $request)
+    public function register(UserRequest $request): Response
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:6',
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
-        }
-
-        $user = User::create([
-            'name' => $request->get('name'),
-            'email' => $request->get('email'),
-            'password' => Hash::make($request->get('password')),
-        ]);
+        $user= $this->service->create($request);
 
         $token = FacadesJWTAuth::fromUser($user);
 
