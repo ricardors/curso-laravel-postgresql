@@ -21,18 +21,18 @@ class UserService
     * @param Request $request
     * @return User
     */
-    public function create(UserRequest $request): array
+    public function create(Request $request): User
     {
-        $count = $this->repository->countByUserServiceId(
-            $request['service']
+        $count = $this->repository->countByEmail(
+            $request['email']
         );
 
         if ($count) {
             $msg = 'Já existe!';
             throw new ApiException($msg, 422);
         }
-        $user = $this->repository->create($request->all());
-        return $this->formatResponse($user);
+        return $user = $this->repository->create($request->all());
+        
     }
 
 

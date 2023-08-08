@@ -68,8 +68,9 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
-    public function register(UserRequest $request): Response
+    public function register(Request $request)
     {
+        //dd( $request->all());
         $user= $this->service->create($request);
 
         $token = FacadesJWTAuth::fromUser($user);
