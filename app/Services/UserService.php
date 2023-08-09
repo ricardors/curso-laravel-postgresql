@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\ApiException;
+use App\Http\Requests\UserRequest;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
@@ -21,18 +22,17 @@ class UserService
     * @param Request $request
     * @return User
     */
-    public function create(UserRequest $request): array
+    public function create(Request $request): User
     {
-        $count = $this->repository->countByUserServiceId(
-            $request['service']
+        $count = $this->repository->countByEmail(
+            $request['email']
         );
 
         if ($count) {
-            $msg = 'Já existe!';
-            throw new ApiException($msg, 422);
+            throw new ApiException(['message' => 'Already exists!'], 422);
         }
         $user = $this->repository->create($request->all());
-        return $this->formatResponse($user);
+        return $user ;
     }
 
 
@@ -45,7 +45,7 @@ class UserService
      */
     public function update(string $number, array $data): array
     {
-   
+        return ['message' => 'Object updated successfully'];
     }
 
     /**

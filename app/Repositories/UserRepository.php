@@ -32,5 +32,9 @@ class UserRepository
     {         
         return User::whereServiceId($serviceId)->count();
     }
+    public function countByEmail(string $email): int
+    {         
+        return User::whereEmail($email)->count();
+    }
     
 }
